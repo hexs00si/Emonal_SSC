@@ -4,135 +4,77 @@ struct JournalEntryView: View {
     @ObservedObject var viewModel: JournalEntryViewModel
     @Binding var isPresented: Bool
     
-    @State private var selectedMood: Double = 2 // Middle mood
-    @State private var selectedMoodEmoji: String = "😐"
-    @State private var isNextStep = false
-    
-    // Mood configuration
-    let moods = [
-        (emoji: "😢", label: "Very Sad", value: 0.0),
-        (emoji: "🙁", label: "Sad", value: 1.0),
-        (emoji: "😐", label: "Neutral", value: 2.0),
-        (emoji: "🙂", label: "Happy", value: 3.0),
-        (emoji: "😄", label: "Very Happy", value: 4.0)
-    ]
+    @State private var moodScore: Float = 3.0
+    @State private var showJournalEditor = false
     
     var body: some View {
-        VStack(spacing: 20) {
-            // Navigation Bar
-            HStack {
-                Button(action: {
-                    isPresented = false
-                }) {
-                    HStack {
-                        Image(systemName: "chevron.left")
-                        Text("Back")
-                    }
-                    .foregroundColor(.gray)
-                }
-                Spacer()
-            }
-            .padding()
-            
+        VStack(spacing: 24) {
             // Title
             Text("How are you feeling today?")
-                .font(.title)
+                .font(.title2)
                 .fontWeight(.bold)
             
+            // Subtitle
             Text("Slide to match your current mood")
+                .font(.subheadline)
                 .foregroundColor(.secondary)
             
-            // Large Mood Emoji
-            Text(selectedMoodEmoji)
-                .font(.system(size: 80))
-                .padding()
+            // Large emoji display
+            Text(moodEmoji(for: moodScore))
+                .font(.system(size: 60))
+                .padding(.vertical, 16)
             
-            // Mood Emojis
-            HStack(spacing: 0) {
-                ForEach(moods, id: \.label) { mood in
-                    Text(mood.emoji)
-                        .font(.system(size: 24))
+            // Mood slider
+            Slider(value: $moodScore, in: 1...5, step: 1)
+                .tint(Color(hex: "8B5DFF"))
+                .padding(.horizontal)
+            
+            // Mood labels
+            HStack {
+                ForEach(1...5, id: \.self) { index in
+                    Text(moodEmoji(for: Float(index)))
+                        .font(.system(size: 20))
+                        .opacity(abs(Float(index) - moodScore) < 0.5 ? 1 : 0.3)
                         .frame(maxWidth: .infinity)
                 }
             }
-            
-            // Custom Discrete Slider
-            CustomDiscreteSlider(
-                value: $selectedMood,
-                steps: Double(moods.count - 1)
-            )
-            .onChange(of: selectedMood) { newValue in
-                // Round to nearest integer to get the correct mood
-                let index = Int(round(newValue))
-                selectedMoodEmoji = moods[index].emoji
-            }
-            
-            // Mood Label
-            Text(moods[Int(round(selectedMood))].label)
-                .foregroundColor(.secondary)
+            .padding(.horizontal)
             
             Spacer()
             
-            // Continue Button
+            // Continue button
             Button(action: {
-                isNextStep = true
+                showJournalEditor = true
             }) {
                 Text("Continue")
+                    .font(.headline)
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color(hex: "8B5DFF"))
-                    .cornerRadius(10)
+                    .cornerRadius(12)
             }
-            .padding()
+            .padding(.horizontal)
         }
-        .fullScreenCover(isPresented: $isNextStep) {
+        .padding()
+        .sheet(isPresented: $showJournalEditor) {
             JournalEditorView(
                 viewModel: viewModel,
                 isPresented: $isPresented,
-                moodScore: Float(selectedMood / Double(moods.count - 1)),
-                selectedMoodEmoji: selectedMoodEmoji
-            )
+                moodScore: moodScore,
+                selectedMoodEmoji: moodEmoji(for: moodScore)
+                )
         }
     }
-}
-// (Keep the CustomDiscreteSlider from the previous implementation)
-struct CustomDiscreteSlider: View {
-    @Binding var value: Double
-    let steps: Double
     
-    var body: some View {
-        GeometryReader { geometry in
-            ZStack(alignment: .leading) {
-                // Track
-                Rectangle()
-                    .fill(Color.purple.opacity(0.2))
-                    .frame(height: 5)
-                    .cornerRadius(2.5)
-                
-                // Filled Track
-                Rectangle()
-                    .fill(Color(hex: "8B5DFF"))
-                    .frame(width: CGFloat(value / steps) * geometry.size.width, height: 5)
-                    .cornerRadius(2.5)
-                
-                // Slider Thumb
-                Circle()
-                    .fill(Color(hex: "8B5DFF"))
-                    .frame(width: 20, height: 20)
-                    .offset(x: CGFloat(value / steps) * geometry.size.width - 10)
-                    .gesture(
-                        DragGesture()
-                            .onChanged { gesture in
-                                // Calculate the new value based on the drag position
-                                let newValue = min(max(0, gesture.translation.width / geometry.size.width * steps + value), steps)
-                                // Snap to nearest step
-                                self.value = round(newValue)
-                            }
-                    )
-            }
+    private func moodEmoji(for score: Float) -> String {
+        switch score {
+        case 1: return "😢"
+        case 2: return "😕"
+        case 3: return "😐"
+        case 4: return "🙂"
+        case 5: return "😊"
+        default: return "😐"
         }
-        .frame(height: 30)
-        .padding(.horizontal)
     }
 }

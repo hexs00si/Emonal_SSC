@@ -9,74 +9,82 @@ struct JournalEditorView: View {
     let selectedMoodEmoji: String
     
     var body: some View {
-        VStack(spacing: 20) {
-            // Navigation Bar
+        VStack(spacing: 16) {
+            // Top Bar with Cancel Button
             HStack {
-                Button(action: {
-                    isPresented = false
-                }) {
-                    HStack {
-                        Image(systemName: "chevron.left")
-                        Text("Back")
-                    }
-                    .foregroundColor(.gray)
-                }
                 Spacer()
+                Button(action: {
+                    isPresented = false // Dismiss the sheet
+                }) {
+                    Text("Cancel")
+                        .foregroundColor(.black) // Black color for minimalism
+                        .font(.headline)
+                }
             }
-            .padding()
+            .padding(.horizontal)
+            .padding(.top, 16)
             
-            // Date Display
-            Text(Date(), formatter: dateFormatter)
-                .font(.headline)
-                .foregroundColor(.secondary)
-            
-            Text("What's on your mind?")
-                .font(.title2)
-                .fontWeight(.bold)
+            // Title and Date
+            VStack(spacing: 8) {
+                Text("What's on your mind?")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                Text(Date(), formatter: dateFormatter)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .padding(.horizontal)
             
             // Journal Text Editor
             TextEditor(text: $journalText)
-                .frame(minHeight: 200)
+                .frame(maxHeight: .infinity)
+                .padding()
+                .background(Color(.systemBackground))
+                .cornerRadius(12)
                 .overlay(
                     Group {
                         if journalText.isEmpty {
                             Text("Start writing...")
                                 .foregroundColor(.gray)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 12)
+                                .padding(.horizontal, 24)
+                                .padding(.vertical, 32)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                         }
                     }
                 )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                )
-                .padding()
-            
-            Spacer()
+                .padding(.horizontal)
             
             // Save Button
-            Button(action: {
-                // Save journal entry
-                viewModel.saveEntry(
-                    text: journalText,
-                    moodScore: moodScore,
-                    moodEmoji: selectedMoodEmoji
-                )
-                
-                // Dismiss all sheets
-                isPresented = false
-            }) {
+            Button(action: saveAndDismiss) {
                 Text("Save")
+                    .font(.headline)
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color(hex: "8B5DFF"))
-                    .cornerRadius(10)
+                    .cornerRadius(12)
             }
-            .padding()
+            .padding(.horizontal)
             .disabled(journalText.isEmpty)
+            .opacity(journalText.isEmpty ? 0.6 : 1.0)
         }
+        .padding(.vertical)
+        .background(Color(.systemBackground))
+    }
+    
+    private func saveAndDismiss() {
+        // Save journal entry
+        viewModel.saveEntry(
+            text: journalText,
+            moodScore: moodScore,
+            moodEmoji: selectedMoodEmoji
+        )
+        
+        // Dismiss all sheets
+        isPresented = false
     }
     
     // Custom date formatter
@@ -86,4 +94,3 @@ struct JournalEditorView: View {
         return formatter
     }
 }
-
