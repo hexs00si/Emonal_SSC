@@ -2,37 +2,29 @@ import SwiftUI
 
 struct CalendarView: View {
     @StateObject private var viewModel: CalendarViewModel
-
+    @State private var selectedDate: Date?
+    @State private var showEntriesModal = false
+    
     init() {
         let context = CoreDataManager.shared.viewContext
         _viewModel = StateObject(wrappedValue: CalendarViewModel(viewContext: context))
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Top Bar
-            HStack {
+        ScrollView {
+            VStack(spacing: 16) {
+                // Calendar Heading
                 Text("Calendar")
                     .font(.title)
                     .fontWeight(.bold)
-                Spacer()
-            }
-            .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal)
 
-            WaveHeaderView()
-                .padding(.bottom, 16)
+                // Calendar Grid
+                CalendarGrid(selectedDate: $selectedDate, averageMoodScores: viewModel.averageMoodScores)
+                    .padding(.horizontal)
 
-            VStack(spacing: 16) {
-                // Total Entries Card
-                infoCard(
-                    title: "Total Entries",
-                    value: "\(viewModel.totalEntries)",
-                    gradientColors: [Color.white, Color(hex: "F5F5F5")],
-                    textColor: .black,
-                    emoji: "📖"
-                )
-
-                // Day Streak Card with Conditional Styling
+                // Day Streak Card
                 infoCard(
                     title: "Day Streak",
                     value: "\(viewModel.dayStreak)",
@@ -43,12 +35,34 @@ struct CalendarView: View {
                     emoji: viewModel.dayStreak == 0 ? "🌱" : "🔥", // 🌱 if 0, 🔥 otherwise
                     streakMessage: viewModel.dayStreak == 0 ? "Start your journey today!" : "Keep going! You're on a streak!"
                 )
+                .padding(.horizontal)
+
+                // Total Entries Card
+                infoCard(
+                    title: "Total Entries",
+                    value: "\(viewModel.totalEntries)",
+                    gradientColors: [Color.white, Color(hex: "F5F5F5")],
+                    textColor: .black,
+                    emoji: "📖"
+                )
+                .padding(.horizontal)
 
                 Spacer()
             }
-            .padding()
+            .padding(.vertical)
         }
         .background(Color(.systemBackground))
+        .onChange(of: selectedDate) { newDate in
+            // Show the modal when a date with entries is selected
+            if newDate != nil {
+                showEntriesModal = true
+            }
+        }
+        .sheet(isPresented: $showEntriesModal) {
+            if let selectedDate = selectedDate {
+                JournalEntriesModal(date: selectedDate, viewModel: viewModel)
+            }
+        }
     }
     
     // Reusable Card Component
