@@ -1,38 +1,64 @@
-//
-//  SwiftUIView.swift
-//  Emonal
-//
-//  Created by Shravan Rajput on 20/02/25.
-//
 import SwiftUI
+import CoreData
 
 struct JournalView: View {
-    @State private var showingNewEntrySheet = false
+    @StateObject private var viewModel: JournalEntryViewModel
+    @State private var showJournalEntry = false
     
+    init() {
+        // Use the view context directly from CoreDataManager
+        let context = CoreDataManager.shared.viewContext
+        _viewModel = StateObject(wrappedValue: JournalEntryViewModel(viewContext: context))
+    }
+
     var body: some View {
         VStack(spacing: 0) {
-            // Navigation Bar
+            // Top Bar with Title and Plus Button
             HStack {
                 Text("Your Journal")
-                    .font(.title2.bold())
+                    .font(.title)
+                    .fontWeight(.bold)
+                
                 Spacer()
+                
                 Button(action: {
-                    showingNewEntrySheet = true
+                    showJournalEntry = true
                 }) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title2)
-                        .foregroundColor(Color(hex: "8B5DFF"))
+                    Image(systemName: "plus")
+                        .foregroundColor(.white)
+                        .padding(8)
+                        .background(Color(hex: "8B5DFF"))
+                        .clipShape(Circle())
                 }
             }
             .padding()
             
-            // Wave Header Component
+            // Wave Header
             WaveHeaderView()
+                .padding(.bottom, 16)
             
-            // Empty State Component
-            EmptyJournalView()
+            // Conditional content based on entries
+            if viewModel.entries.isEmpty {
+                EmptyJournalView()
+                Spacer()
+            } else {
+                ScrollView {
+                    VStack(spacing: 16) {
+                        ForEach(viewModel.entries, id: \.id) { entry in
+                            JournalEntryCard(entry: entry)
+                        }
+                    }
+                    .padding()
+                }
+            }
             
             Spacer()
+        }
+        .sheet(isPresented: $showJournalEntry) {
+            JournalEntryView(viewModel: viewModel, isPresented: $showJournalEntry)
+        }
+        .onAppear {
+            viewModel.fetchEntries()
         }
     }
 }
