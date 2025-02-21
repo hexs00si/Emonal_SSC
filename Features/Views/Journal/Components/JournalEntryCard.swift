@@ -11,34 +11,44 @@ struct JournalEntryCard: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
+            // Date and Mood Emoji
             HStack {
                 Text(dateFormatter.string(from: entry.date))
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                 
                 Spacer()
+                
+                Text(entry.moodEmoji)
+                    .font(.title2)
+                    .padding(8)
+                    .background(Color.white)
+                    .clipShape(Circle())
+                    .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 2) // Darker shadow
             }
             
+            // Journal Text
             Text(entry.text)
                 .font(.body)
                 .lineLimit(3)
+                .foregroundColor(.primary)
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color.white)
-                .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 2)
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color.white,
+                            Color(hex: "F5F5F5") // Subtle gradient
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5) // Darker and steeper shadow
         )
-        .overlay(
-            Text(entry.moodEmoji)
-                .font(.title)
-                .padding(8)
-                .background(Color.white)
-                .clipShape(Circle())
-                .shadow(color: .black.opacity(0.1), radius: 3, x: 0, y: 1)
-                .offset(x: -8, y: -8),
-            alignment: .topTrailing
-        )
+        .padding(.horizontal, 8)
     }
 }

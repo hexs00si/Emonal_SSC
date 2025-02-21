@@ -1,5 +1,4 @@
 import SwiftUI
-import CoreData
 
 struct JournalView: View {
     @StateObject private var viewModel: JournalEntryViewModel
