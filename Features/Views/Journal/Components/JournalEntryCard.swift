@@ -1,7 +1,9 @@
 import SwiftUI
 
 struct JournalEntryCard: View {
-    let entry: JournalEntry
+    let entry: JournalEntryViewModel.EntryData
+    @ObservedObject var viewModel: JournalEntryViewModel
+    @State private var showDetailView = false
     
     private var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
@@ -24,7 +26,7 @@ struct JournalEntryCard: View {
                     .padding(8)
                     .background(Color.white)
                     .clipShape(Circle())
-                    .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 2) // Darker shadow
+                    .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 2)
             }
             
             // Journal Text
@@ -41,14 +43,28 @@ struct JournalEntryCard: View {
                     LinearGradient(
                         gradient: Gradient(colors: [
                             Color.white,
-                            Color(hex: "F5F5F5") // Subtle gradient
+                            Color(hex: "F5F5F5")
                         ]),
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                 )
-                .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5) // Darker and steeper shadow
+                .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5)
         )
-        .padding(.horizontal, 8)
+        .onTapGesture {
+            showDetailView = true
+        }
+        .sheet(isPresented: $showDetailView) {
+            NavigationView {
+                JournalDetailView(entry: entry, viewModel: viewModel, isPresented: $showDetailView)
+                    .navigationBarItems(
+                        trailing: Button("Done") {
+                            showDetailView = false
+                        }
+                        .foregroundColor(Color(hex: "8B5DFF"))
+                        .fontWeight(.medium)
+                    )
+            }
+        }
     }
 }

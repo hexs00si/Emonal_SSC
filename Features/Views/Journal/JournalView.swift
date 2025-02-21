@@ -5,14 +5,13 @@ struct JournalView: View {
     @State private var showJournalEntry = false
     
     init() {
-        // Use the view context directly from CoreDataManager
         let context = CoreDataManager.shared.viewContext
         _viewModel = StateObject(wrappedValue: JournalEntryViewModel(viewContext: context))
     }
-
+    
     var body: some View {
         VStack(spacing: 0) {
-            // Top Bar with Title and Plus Button
+            // Top Bar
             HStack {
                 Text("Your Journal")
                     .font(.title)
@@ -32,32 +31,26 @@ struct JournalView: View {
             }
             .padding()
             
-            // Wave Header
             WaveHeaderView()
                 .padding(.bottom, 16)
             
-            // Conditional content based on entries
             if viewModel.entries.isEmpty {
                 EmptyJournalView()
                 Spacer()
             } else {
                 ScrollView {
-                    VStack(spacing: 16) {
-                        ForEach(viewModel.entries, id: \.id) { entry in
-                            JournalEntryCard(entry: entry)
+                    LazyVStack(spacing: 16) {
+                        ForEach(viewModel.entries) { entry in
+                            JournalEntryCard(entry: entry, viewModel: viewModel)
+                                .padding(.horizontal)
                         }
                     }
-                    .padding()
+                    .padding(.vertical)
                 }
             }
-            
-            Spacer()
         }
         .sheet(isPresented: $showJournalEntry) {
             JournalEntryView(viewModel: viewModel, isPresented: $showJournalEntry)
-        }
-        .onAppear {
-            viewModel.fetchEntries()
         }
     }
 }
