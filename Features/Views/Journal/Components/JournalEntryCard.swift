@@ -5,17 +5,17 @@ struct JournalEntryCard: View {
     @ObservedObject var viewModel: JournalEntryViewModel
     @State private var showDetailView = false
     
-    private var dateFormatter: DateFormatter {
+    private var timeFormatter: DateFormatter {
         let formatter = DateFormatter()
-        formatter.dateFormat = "d MMM yyyy 'at' h:mm a"
+        formatter.dateFormat = "h:mm a" // Only show time
         return formatter
     }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            // Date and Mood Emoji
+            // Time and Mood Emoji
             HStack {
-                Text(dateFormatter.string(from: entry.date))
+                Text(timeFormatter.string(from: entry.date)) // Only show time
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                 
