@@ -9,12 +9,12 @@ struct HomeView: View {
     }
     
     var body: some View {
-        NavigationView { // Wrap the entire view in a NavigationView
+        NavigationView {
             ScrollView {
                 VStack(spacing: 16) {
                     // Home Heading
                     Text("Home")
-                        .font(.title)
+                        .font(.largeTitle)
                         .fontWeight(.bold)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal)
@@ -23,24 +23,31 @@ struct HomeView: View {
                     GreetingView()
                         .padding(.horizontal)
                     
-                    // Emotional Wellness Description
+                    // Emotional Wellness Section
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Your Emotional Wellness")
-                            .font(.headline)
-                            .foregroundColor(.secondary)
+                            .font(.title3)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.primary)
                         
                         Text("Tap to explore your weekly emotional journey. Understand your emotional patterns and celebrate your progress.")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
+                            .font(.body)
+                            .foregroundColor(.primary)
                             .lineLimit(3)
                     }
                     .padding(.horizontal)
                     
+                    // Tap to view details indicator
+                    Text("Tap to view details ⬇️")
+                        .font(.footnote)
+                        .fontWeight(.medium)
+                        .foregroundColor(.gray)
+                        .padding(.top, 5)
+
                     // Weekly Emotional Pattern Card with Navigation
                     NavigationLink(destination: EmotionalJourneyView(viewModel: viewModel)) {
                         WeeklyEmotionalPatternCard(viewModel: viewModel)
                             .padding(.horizontal)
-                            .contentShape(Rectangle()) // Ensure the entire area is tappable
                     }
                     .buttonStyle(PlainButtonStyle())
                     
@@ -49,7 +56,7 @@ struct HomeView: View {
                 .padding(.vertical)
             }
             .background(Color(.systemBackground))
-            .navigationBarHidden(true) // Hide the navigation bar if needed
+            .navigationBarHidden(true) // Hide navigation bar
         }
     }
 }
