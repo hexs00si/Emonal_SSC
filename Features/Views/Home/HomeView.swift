@@ -23,6 +23,10 @@ struct HomeView: View {
                     GreetingView()
                         .padding(.horizontal)
                     
+                    // QuoteCard
+                    QuoteCard(viewModel: viewModel)
+                        .padding(.horizontal)
+                    
                     // Emotional Wellness Section
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Your Emotional Wellness")
