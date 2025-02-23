@@ -44,7 +44,7 @@ struct JournalView: View {
             .padding()
             
             WaveHeaderView()
-                .padding(.bottom, 16)
+                .padding(.bottom, 12)
             
             if viewModel.entries.isEmpty {
                 EmptyJournalView()
