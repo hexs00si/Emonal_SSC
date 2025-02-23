@@ -5,19 +5,18 @@ struct WeeklyEmotionalPatternCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // Title and Subtitle
+            
             VStack(alignment: .leading, spacing: 4) {
-                Text("Emotional Wellness Snapshot")
+                Text("Your Emotional Wellness")
                     .font(.headline)
                     .fontWeight(.semibold)
                     .foregroundColor(.white)
 
-                Text("Understand your emotional journey and growth")
+                Text("Track your emotions and well-being over time")
                     .font(.footnote)
                     .foregroundColor(.white.opacity(0.8))
             }
 
-            // Emotional Score Section
             HStack(alignment: .bottom) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("This Week")
@@ -38,7 +37,6 @@ struct WeeklyEmotionalPatternCard: View {
 
                 Spacer()
 
-                // Trend Indicator
                 if !viewModel.weeklyChangeText.contains("nan") {
                     HStack {
                         Image(systemName: viewModel.weeklyChangeText.contains("↑") ? "arrow.up.circle.fill" : "arrow.down.circle.fill")
@@ -52,30 +50,26 @@ struct WeeklyEmotionalPatternCard: View {
                 }
             }
 
-            // Progress Indicator
             GeometryReader { geometry in
                 ZStack(alignment: .leading) {
-                    Rectangle()
+                    Capsule()
                         .fill(Color.white.opacity(0.3))
                         .frame(height: 8)
-                        .cornerRadius(4)
 
-                    Rectangle()
+                    Capsule()
                         .fill(progressColor)
                         .frame(width: progressWidth(in: geometry.size.width), height: 8)
-                        .cornerRadius(4)
                 }
             }
             .frame(height: 8)
         }
         .padding()
-        .background(gradientBackground) // Modern Gradient
+        .background(gradientBackground)
         .cornerRadius(16)
         .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
-        .contentShape(Rectangle()) // Ensure entire card is tappable
+        .contentShape(Rectangle())
     }
 
-    // Compute progress color based on score
     private var progressColor: Color {
         let score = viewModel.weeklyEmotionalScore.isFinite ? viewModel.weeklyEmotionalScore : 0
         switch score {
@@ -90,16 +84,14 @@ struct WeeklyEmotionalPatternCard: View {
         }
     }
 
-    // Compute progress width based on score
     private func progressWidth(in totalWidth: CGFloat) -> CGFloat {
         let score = viewModel.weeklyEmotionalScore.isFinite ? viewModel.weeklyEmotionalScore : 0
         return totalWidth * CGFloat(score / 10)
     }
 
-    // Modern gradient background
     private var gradientBackground: LinearGradient {
         LinearGradient(
-            gradient: Gradient(colors: [Color.blue.opacity(0.8), Color.purple.opacity(0.8)]),
+            gradient: Gradient(colors: [Color.purple.opacity(0.8), Color.blue.opacity(0.8)]),
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )

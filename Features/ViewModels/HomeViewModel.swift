@@ -50,8 +50,12 @@ class HomeViewModel: ObservableObject {
                 return calculateEmotionalScore(moodScore: entry.moodScore, sentimentScore: sentimentScore)
             }
             let averageScore = scores.reduce(0, +) / Float(scores.count)
-            return DailyEmotionalScore(day: date.formatted(.dateTime.weekday(.wide)), emoji: moodEmoji(for: averageScore / 10), score: averageScore)
+            return DailyEmotionalScore(day: date.formatted(.dateTime.weekday(.wide)), emoji: moodEmoji(for: averageScore), score: averageScore)
         }
+        
+        // Sort the days from Monday to Sunday
+        let dayOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        dailyEmotionalScores.sort { dayOrder.firstIndex(of: $0.day)! < dayOrder.firstIndex(of: $1.day)! }
     }
     
     private func calculateLastWeekEmotionalScore() -> Float {
@@ -94,11 +98,11 @@ class HomeViewModel: ObservableObject {
     
     private func moodEmoji(for score: Float) -> String {
         switch score {
-        case 0..<2: return "😢"
-        case 2..<4: return "😕"
-        case 4..<6: return "😐"
-        case 6..<8: return "🙂"
-        case 8...10: return "😊"
+        case 1..<2: return "😢"
+        case 2..<3: return "😕"
+        case 3..<4: return "😐"
+        case 4..<5: return "🙂"
+        case 5...: return "😊"
         default: return "😐"
         }
     }

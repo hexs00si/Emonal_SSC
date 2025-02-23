@@ -23,6 +23,17 @@ struct CalendarView: View {
                 // Calendar Grid
                 CalendarGrid(selectedDate: $selectedDate, averageMoodScores: viewModel.averageMoodScores)
                     .padding(.horizontal)
+                
+                // Information note
+                HStack(spacing: 8) {
+                    Image(systemName: "info.circle.fill")
+                        .foregroundColor(.secondary)
+                    Text("Tap on an emoji 😊 to view that day's journal entries")
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.horizontal)
+                .padding(.top, -8)
 
                 // Day Streak Card
                 infoCard(
