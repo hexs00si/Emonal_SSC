@@ -27,10 +27,41 @@ struct EmotionalJourneyView: View {
                     .padding(.horizontal)
                     
                     // Score Header
-                    ScoreHeaderView(
-                        score: viewModel.weeklyEmotionalScore,
-                        weeklyChangeText: viewModel.weeklyChangeText
-                    )
+                    VStack(spacing: 8) {
+                        Text("Your Weekly Emotional Score")
+                            .font(.system(size: 32, weight: .bold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                            .padding(.horizontal, 20)
+                        
+                        Text("A gentle reflection of your journal entries this week")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            
+                        HStack {
+                            Text("\(String(format: "%.1f", viewModel.weeklyEmotionalScore))")
+                                .font(.system(size: 48, weight: .bold))
+                            Text("/ 10")
+                                .font(.title2)
+                                .foregroundColor(.secondary)
+                                .padding(.top, 8)
+                        }
+                        
+                        if !viewModel.weeklyChangeText.contains("nan") {
+                            HStack(spacing: 6) {
+                                Image(systemName: viewModel.weeklyChangeText.contains("↑") ? "arrow.up.circle.fill" : "arrow.down.circle.fill")
+                                    .foregroundColor(viewModel.weeklyChangeText.contains("↑") ?
+                                        Color(hex: "8B5DFF") : Color(hex: "F3696E"))
+                                
+                                Text(viewModel.weeklyChangeText.replacingOccurrences(of: "↑", with: "").replacingOccurrences(of: "↓", with: ""))
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                    }
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
                     
                     // Emotional Journey Section
                     VStack(alignment: .leading, spacing: 20) {
@@ -72,10 +103,11 @@ struct EmotionalJourneyView: View {
                     }
                     .padding(.horizontal)
                     
-                    Spacer()
+                    Spacer(minLength: 0)
                 }
                 .padding(.vertical)
                 .frame(minHeight: geometry.size.height)
+                .frame(maxWidth: geometry.size.width)
             }
             .background(Color(.systemBackground))
             .navigationBarHidden(true)

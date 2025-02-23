@@ -54,7 +54,7 @@ class HomeViewModel: ObservableObject {
         }
         
         // Sort the days from Monday to Sunday
-        let dayOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        let dayOrder = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
         dailyEmotionalScores.sort { dayOrder.firstIndex(of: $0.day)! < dayOrder.firstIndex(of: $1.day)! }
     }
     
