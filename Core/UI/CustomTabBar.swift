@@ -14,7 +14,7 @@ struct CustomTabBar: View {
                 selectedTab = .home
             } label: {
                 VStack(spacing: 4) {
-                    Image(systemName: "chart.bar.fill")
+                    Image(systemName: "house")
                         .font(.system(size: 20))
                     Text("Home")
                         .font(.caption)
