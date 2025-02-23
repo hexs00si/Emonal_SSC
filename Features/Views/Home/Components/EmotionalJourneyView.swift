@@ -5,122 +5,88 @@ struct EmotionalJourneyView: View {
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
-        VStack(spacing: 20) {
-            
-            // Custom Back Button
-            HStack {
-                Button(action: {
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    HStack {
-                        Image(systemName: "chevron.left")
-                            .foregroundColor(.purple)
-                        Text("Back")
-                            .foregroundColor(.purple)
-                            .font(.body)
-                    }
-                }
-                Spacer()
-            }
-            .padding(.leading)
-
-            // Emotional Score Display
-            VStack(spacing: 8) {
-                Text("Your Weekly Emotional Score")
-                    .font(.title)
-                    .fontWeight(.bold)
-
+        ScrollView {
+            VStack(spacing: 24) {
+                // Back Button
                 HStack {
-                    Text("\(String(format: "%.1f", viewModel.weeklyEmotionalScore))")
-                        .font(.system(size: 50, weight: .bold))
-                        .foregroundColor(.primary)
-
-                    Text("/ 10")
-                        .font(.title2)
-                        .foregroundColor(.secondary)
-                }
-
-                if !viewModel.weeklyChangeText.contains("nan") {
-                    HStack {
-                        Image(systemName: viewModel.weeklyChangeText.contains("↑") ? "arrow.up.circle.fill" : "arrow.down.circle.fill")
-                            .foregroundColor(viewModel.weeklyChangeText.contains("↑") ? .green : .red)
-
-                        Text(viewModel.weeklyChangeText.replacingOccurrences(of: "↑", with: "").replacingOccurrences(of: "↓", with: ""))
-                            .font(.subheadline)
-                            .fontWeight(.bold)
-                            .foregroundColor(.secondary)
-                    }
-                }
-            }
-
-            // Emotional Journey - Linear Calendar
-            VStack(spacing: 16) {
-                Text("Your Emotional Journey")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                
-                VStack(spacing: 12) {
-                    ForEach(viewModel.dailyEmotionalScores, id: \.day) { score in
-                        HStack {
-                            Text(score.day) // Full day name
-                                .font(.headline)
-                                .frame(width: 60, alignment: .leading)
-                                .foregroundColor(.secondary)
-
-                            RoundedRectangle(cornerRadius: 4)
-                                .fill(emotionColor(for: score.score))
-                                .frame(width: CGFloat(score.score * 20), height: 10)
-
-                            Spacer()
-                            
-                            Text("\(String(format: "%.1f", score.score))")
-                                .font(.subheadline)
-                                .fontWeight(.bold)
-                                .foregroundColor(.primary)
+                    Button(action: {
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        HStack(spacing: 5) {
+                            Image(systemName: "chevron.left")
+                            Text("Back")
                         }
+                        .foregroundColor(Color(hex: "8B5DFF"))
+                        .font(.system(size: 17, weight: .regular))
                     }
+                    Spacer()
                 }
                 .padding(.horizontal)
-            }
-
-            // Insight Section
-            VStack(spacing: 8) {
-                Text("What This Week Says About You")
-                    .font(.headline)
-
-                Text(getInsightMessage(for: viewModel.weeklyEmotionalScore))
-                    .font(.body)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
+                
+                // Score Header
+                ScoreHeaderView(
+                    score: viewModel.weeklyEmotionalScore,
+                    weeklyChangeText: viewModel.weeklyChangeText
+                )
+                
+                // Emotional Journey Section
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("Your Emotional Journey")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .padding(.horizontal)
+                    
+                    VStack(spacing: 16) {
+                        ForEach(viewModel.dailyEmotionalScores, id: \.day) { score in
+                            DailyScoreRow(day: score.day, score: score.score)
+                        }
+                    }
                     .padding(.horizontal)
+                }
+                
+                // Insight Section
+                VStack(spacing: 16) {
+                    Text("What This Week Says About You")
+                        .font(.headline)
+                    
+                    Text(getInsightMessage(for: viewModel.weeklyEmotionalScore))
+                        .font(.body)
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                        .padding(20)
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    Color(hex: "8B5DFF"),
+                                    Color(hex: "5D8BFF")
+                                ]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .cornerRadius(16)
+                }
+                .padding(.horizontal)
+                
+                Spacer()
             }
-            
-            Spacer()
+            .padding(.vertical)
         }
-        .padding()
         .background(Color(.systemBackground))
         .navigationBarHidden(true)
     }
-
-    private func emotionColor(for score: Float) -> Color {
-        switch score {
-        case 0..<4: return .red
-        case 4..<7: return .yellow
-        case 7...10: return .green
-        default: return .gray
-        }
-    }
-
+    
     private func getInsightMessage(for score: Float) -> String {
         switch score {
         case 0..<4:
-            return "It’s okay to have tough weeks. Take some time for self-care and reflection."
+            return "Every emotion is valid. This week might have been challenging, and that's okay. Take gentle care of yourself."
         case 4..<7:
-            return "You're making progress! Keep celebrating small wins."
+            return "You're navigating your journey thoughtfully. Each day brings new opportunities for growth and self-discovery."
         case 7...10:
-            return "Amazing! Keep up the positive momentum!"
+            return "Your emotional awareness is flourishing. Remember, it's okay to have ups and downs within these positive moments."
         default:
-            return "Reflect on your emotions and celebrate your journey."
+            return "Your journey is unique. Each entry helps you understand yourself better."
         }
     }
 }
